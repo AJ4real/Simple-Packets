@@ -2,7 +2,7 @@
  Copyright (c) All Rights Reserved
  *********************************/
 
-package me.aj4real.simplepackets.network;
+package me.aj4real.simplepackets;
 
 import sun.misc.Unsafe;
 

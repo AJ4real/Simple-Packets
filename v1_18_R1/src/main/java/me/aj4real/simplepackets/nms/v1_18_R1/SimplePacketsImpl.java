@@ -2,18 +2,21 @@
  Copyright (c) All Rights Reserved
  *********************************/
 
-package me.aj4real.simplepackets.nms.v1_18_R2;
+package me.aj4real.simplepackets.nms.v1_18_R1;
 
 import io.netty.channel.ChannelFuture;
-import me.aj4real.simplepackets.NMS;
-import me.aj4real.simplepackets.network.*;
+import me.aj4real.simplepackets.SimplePackets;
+import me.aj4real.simplepackets.Client;
+import me.aj4real.simplepackets.Packets;
+import me.aj4real.simplepackets.ProxyList;
+import me.aj4real.simplepackets.TheUnsafe;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerConnectionListener;
 import net.minecraft.server.players.PlayerList;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
+import org.bukkit.craftbukkit.v1_18_R1.CraftServer;
 import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Field;
@@ -21,7 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public class NMSImpl implements NMS {
+public class SimplePacketsImpl implements SimplePackets {
 
     public void onEnable(Plugin plugin) {
         try {

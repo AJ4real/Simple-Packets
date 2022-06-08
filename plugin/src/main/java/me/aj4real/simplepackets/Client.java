@@ -2,7 +2,7 @@
  Copyright (c) All Rights Reserved
  *********************************/
 
-package me.aj4real.simplepackets.network;
+package me.aj4real.simplepackets;
 
 import io.netty.channel.*;
 import org.bukkit.entity.Player;
@@ -88,11 +88,11 @@ public class Client<C> extends ChannelDuplexHandler {
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         msg = handle(msg);
-        if(msg != null) super.write(ctx, handle(msg), promise);
+        if(msg != null) super.write(ctx, msg, promise);
     }
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         msg = handle(msg);
-        if(msg != null) super.channelRead(ctx, handle(msg));
+        if(msg != null) super.channelRead(ctx, msg);
     }
 }
