@@ -52,7 +52,8 @@ public class Dist extends JavaPlugin {
         v1_16_R3(me.aj4real.simplepackets.nms.v1_16_R3.SimplePacketsImpl.class),
         v1_17_R1(me.aj4real.simplepackets.nms.v1_17_R1.SimplePacketsImpl.class),
         v1_18_R1(me.aj4real.simplepackets.nms.v1_18_R1.SimplePacketsImpl.class),
-        v1_18_R2(me.aj4real.simplepackets.nms.v1_18_R2.SimplePacketsImpl.class);
+        v1_18_R2(me.aj4real.simplepackets.nms.v1_18_R2.SimplePacketsImpl.class),
+        v1_19_R1(me.aj4real.simplepackets.nms.v1_19_R1.SimplePacketsImpl.class);
         private final Class<? extends SimplePackets> nms;
         Version(Class<? extends SimplePackets> nms) {
             this.nms = nms;
