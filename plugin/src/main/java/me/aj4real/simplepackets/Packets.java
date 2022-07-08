@@ -17,6 +17,7 @@ public class Packets {
     public static <T> void addHandler(Class<T> clazz, Handler<T> handler) {
         handlers.put(clazz, handler);
     }
+    private static Disconnection disconnection = new Disconnection();
 
     public static void inject(ChannelFuture connection) {
         final ChannelInboundHandler finishProtocol = new ChannelInitializer<>() {
@@ -25,7 +26,7 @@ public class Packets {
                 Object o = channel.eventLoop().submit(() -> {
                     channel.pipeline()
                             .addBefore("packet_handler", identifier, Client.getFromChannel(channel))
-                            .addLast(new Disconnection());
+                            .addLast(disconnection);
                 });
             }
         };
@@ -47,6 +48,7 @@ public class Packets {
             connection.channel().pipeline().addFirst(connectionHandler);
         });
     }
+    
     @FunctionalInterface
     public interface Handler<T> {
         T handle(Client player, T packet);
