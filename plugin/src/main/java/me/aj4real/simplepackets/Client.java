@@ -16,16 +16,16 @@ import java.util.function.Consumer;
 public class Client<C> extends ChannelDuplexHandler {
     public static BiConsumer sender = null;
     private Consumer<Player> playerWaiter = null;
-    private static final Map<Channel, Client> fromChannel = new HashMap<>();
-    private static final Map<Object, Client> fromConnection = new HashMap<>();
+    public static final Map<Integer, Client> fromChannel = new HashMap<>();
+    public static final Map<Object, Client> fromConnection = new HashMap<>();
     public static final Map<Player, Client> fromPlayer = new HashMap<>();
     private final Channel channel;
     private Player player = null;
     private C connection = null;
 
     public static Client getFromChannel(Channel channel) {
-        Client c = fromChannel.get(channel);
-        if(c == null) return new Client(channel);
+        Client c = fromChannel.get(channel.config().hashCode());
+        if(c == null) c = new Client(channel);
         return c;
     }
 
@@ -38,10 +38,10 @@ public class Client<C> extends ChannelDuplexHandler {
 
     private Client(Channel channel) {
         this.channel = channel;
-        fromChannel.put(channel, this);
+        fromChannel.put(channel.config().hashCode(), this);
     }
     public void dispose() {
-        fromChannel.remove(this.channel);
+        fromChannel.remove(this.channel.config().hashCode());
         if(this.connection != null)
             fromConnection.remove(this.connection);
         if(this.player != null)
@@ -50,24 +50,21 @@ public class Client<C> extends ChannelDuplexHandler {
     public Player getPlayer() {
         return this.player;
     }
-    public C getConnection() {
-        return this.connection;
-    }
-    public void sendPacket(Object packet) {
-        sender.accept(connection, packet);
+    public boolean sendPacket(Object packet) {
+        if(connection != null) {
+            sender.accept(connection, packet);
+            return true;
+        }
+        else return false;
     }
     public void setPlayer(Player player) {
         this.player = player;
         fromPlayer.put(player, this);
-        synchronized (this) {
-            if(this.playerWaiter != null) this.playerWaiter.accept(player);
-        }
+        if(this.playerWaiter != null) this.playerWaiter.accept(player);
     }
     public void waitForPlayer(Consumer<Player> c) {
-        synchronized (this) {
-            if(this.player == null) this.playerWaiter = c;
-            else c.accept(this.player);
-        }
+        if(this.player == null) this.playerWaiter = c;
+        else c.accept(this.player);
     }
     public void setConnection(C connection) {
         this.connection = connection;

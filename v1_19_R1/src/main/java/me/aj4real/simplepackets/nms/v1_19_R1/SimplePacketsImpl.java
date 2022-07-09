@@ -47,7 +47,9 @@ public class SimplePacketsImpl implements SimplePackets {
                 TheUnsafe.get().putObject(
                         con,
                         TheUnsafe.get().objectFieldOffset(connectionsField),
-                        new ProxyList<>(connections, (c) -> Client.getFromChannel(c.channel).setConnection(c), (c) -> {})
+                        new ProxyList<>(connections, (c) -> {
+                            if(!c.preparing) Client.getFromChannel(c.channel).setConnection(c);
+                        }, (c) -> {})
                 );
             }
 
@@ -60,10 +62,10 @@ public class SimplePacketsImpl implements SimplePackets {
                 TheUnsafe.get().putObject(
                         playerList,
                         TheUnsafe.get().objectFieldOffset(serverPlayersField),
-                        new ProxyList<>(players,
-                                (p) -> Client.getFromConnection(p.connection.connection).setPlayer(p.getBukkitEntity().getPlayer()),
-                                (p) -> {
-                                })
+                        new ProxyList<>(players, (p) -> {
+                            Client.getFromChannel(p.connection.connection.channel).setConnection(p.connection.connection);
+                            Client.getFromConnection(p.connection.connection).setPlayer(p.getBukkitEntity().getPlayer());
+                            }, (p) -> {})
                 );
 
             }
