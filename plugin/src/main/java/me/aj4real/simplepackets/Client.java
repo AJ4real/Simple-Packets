@@ -19,7 +19,7 @@ public class Client<C> extends ChannelDuplexHandler {
     public static final Map<Integer, Client> fromChannel = new HashMap<>();
     public static final Map<Object, Client> fromConnection = new HashMap<>();
     public static final Map<Player, Client> fromPlayer = new HashMap<>();
-    private final Channel channel;
+    final Channel channel;
     private Player player = null;
     private C connection = null;
 

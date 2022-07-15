@@ -9,5 +9,7 @@ import org.bukkit.plugin.Plugin;
 public interface SimplePackets {
 
     void onEnable(Plugin plugin);
-
+    default void onDisable(Plugin plugin) {
+        Packets.onDisable(plugin);
+    }
 }

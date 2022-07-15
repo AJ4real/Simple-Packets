@@ -6,12 +6,14 @@ package me.aj4real.simplepackets;
 
 import io.netty.channel.*;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Packets {
     public static Map<Class, Handler> handlers = new HashMap<>();
+    public static Map<ChannelFuture, ChannelHandler> cache = new HashMap<>();
 
     public static String identifier = "simplepackets";
     public static <T> void addHandler(Class<T> clazz, Handler<T> handler) {
@@ -47,8 +49,14 @@ public class Packets {
         connection.channel().eventLoop().submit(() -> {
             connection.channel().pipeline().addFirst(connectionHandler);
         });
+        cache.put(connection, connectionHandler);
     }
-    
+
+    public static void onDisable(Plugin plugin) {
+        Client.fromChannel.values().forEach((v) -> v.channel.pipeline().remove(v));
+        cache.forEach((k,v) -> k.channel().pipeline().remove(v));
+    }
+
     @FunctionalInterface
     public interface Handler<T> {
         T handle(Client player, T packet);
