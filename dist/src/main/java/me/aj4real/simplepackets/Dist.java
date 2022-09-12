@@ -19,9 +19,9 @@ public class Dist extends JavaPlugin {
         main.onLoad(this);
     }
     public void onEnable() {
-        main.onEnable(this, init(this, "simplepackets")); // For the sake of shading.
+        main.onEnable(this, init(this)); // For the sake of shading.
     }
-    public static SimplePackets init(Plugin plugin, String identifier) {
+    public static SimplePackets init(Plugin plugin) {
         String s = Arrays.stream(Package.getPackages())
                 .map(Package::getName)
                 .filter(n -> n.startsWith("org.bukkit.craftbukkit.v1_"))
@@ -29,7 +29,7 @@ public class Dist extends JavaPlugin {
                 .replace("org.bukkit.craftbukkit.", "").split("\\.")[0];
         try {
             plugin.getLogger().log(Level.INFO, Dist.class.getCanonicalName() + ": Attempting to load NMS interface for " + s);
-            Packets.identifier = identifier;
+            Packets.identifier = plugin.getName().toLowerCase();
             SimplePackets nms = Version.valueOf(s).nms.newInstance();
             nms.onEnable(plugin);
             return nms;
@@ -42,14 +42,6 @@ public class Dist extends JavaPlugin {
         main.onDisable(this);
     }
     public enum Version {
-        v1_12_R1(me.aj4real.simplepackets.nms.v1_12_R1.SimplePacketsImpl.class),
-        v1_13_R1(me.aj4real.simplepackets.nms.v1_13_R1.SimplePacketsImpl.class),
-        v1_13_R2(me.aj4real.simplepackets.nms.v1_13_R2.SimplePacketsImpl.class),
-        v1_14_R1(me.aj4real.simplepackets.nms.v1_14_R1.SimplePacketsImpl.class),
-        v1_15_R1(me.aj4real.simplepackets.nms.v1_15_R1.SimplePacketsImpl.class),
-        v1_16_R1(me.aj4real.simplepackets.nms.v1_16_R1.SimplePacketsImpl.class),
-        v1_16_R2(me.aj4real.simplepackets.nms.v1_16_R2.SimplePacketsImpl.class),
-        v1_16_R3(me.aj4real.simplepackets.nms.v1_16_R3.SimplePacketsImpl.class),
         v1_17_R1(me.aj4real.simplepackets.nms.v1_17_R1.SimplePacketsImpl.class),
         v1_18_R1(me.aj4real.simplepackets.nms.v1_18_R1.SimplePacketsImpl.class),
         v1_18_R2(me.aj4real.simplepackets.nms.v1_18_R2.SimplePacketsImpl.class),
