@@ -13,16 +13,9 @@ import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Dist extends JavaPlugin {
-    Dist plugin = null;
-    Main main = new Main();
-    public void onLoad() {
-        this.plugin = this;
-        main.onLoad(this);
-    }
-    public void onEnable() {
-        main.onEnable(this, init(this)); // For the sake of shading.
-    }
+public class Dist {
+    private static Plugin plugin;
+    private static SimplePackets nms;
     public static SimplePackets init(Plugin plugin) {
         String regex = "\\d+(\\.\\d+)+";
         String strVer = Bukkit.getVersion();
@@ -31,19 +24,18 @@ public class Dist extends JavaPlugin {
         matcher.find();
         strVer = 'v' + matcher.group();
         try {
-            plugin.getLogger().log(Level.INFO, "Attempting to load NMS interface for " + strVer);
+            plugin.getLogger().log(Level.INFO, Dist.class.getCanonicalName() + ": Attempting to load NMS interface for " + strVer);
             Version ver = Version.valueOf(strVer.replace('.', '_'));
-            Packets.identifier = plugin.getName().toLowerCase();
-            SimplePackets nms = ver.nms.newInstance();
-            nms.onEnable(plugin);
+            Dist.nms = ver.nms.newInstance();
+            Dist.nms.onEnable(plugin);
+            Dist.plugin = plugin;
+            Client.nms = nms;
+            Packets.onEnable(plugin);
             return nms;
         } catch (Exception e) {
             plugin.getLogger().log(Level.SEVERE, Dist.class.getCanonicalName() + ": Could not initiate support for " + strVer + ", Is it a supported version?", e);
             return null;
         }
-    }
-    public void onDisable() {
-        main.onDisable(this);
     }
     public enum Version {
         v1_17(me.aj4real.simplepackets.nms.v1_17.SimplePacketsImpl.class),
@@ -53,7 +45,8 @@ public class Dist extends JavaPlugin {
         v1_18_2(me.aj4real.simplepackets.nms.v1_18_2.SimplePacketsImpl.class),
         v1_19(me.aj4real.simplepackets.nms.v1_19.SimplePacketsImpl.class),
         v1_19_1(me.aj4real.simplepackets.nms.v1_19_1.SimplePacketsImpl.class),
-        v1_19_2(me.aj4real.simplepackets.nms.v1_19_2.SimplePacketsImpl.class);
+        v1_19_2(me.aj4real.simplepackets.nms.v1_19_2.SimplePacketsImpl.class),
+        v1_19_3(me.aj4real.simplepackets.nms.v1_19_3.SimplePacketsImpl.class);
         private final Class<? extends SimplePackets> nms;
         Version(Class<? extends SimplePackets> nms) {
             this.nms = nms;

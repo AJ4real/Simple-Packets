@@ -8,16 +8,22 @@ import io.netty.channel.*;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Packets {
-    public static Map<Class, Handler> handlers = new HashMap<>();
+    public static Map<Class<?>, List<Handler>> handlers = new HashMap<>();
+    private static Map<Handler, Class> _handlers = new HashMap<>();
     public static Map<ChannelFuture, ChannelHandler> cache = new HashMap<>();
 
     public static String identifier = "simplepackets";
-    public static <T> void addHandler(Class<T> clazz, Handler<T> handler) {
-        handlers.put(clazz, handler);
+    @SuppressWarnings("unused")
+    public static <T> Handler<T> addHandler(Class<T> clazz, Handler<T> handler) {
+        handlers.computeIfAbsent(clazz, (c) -> new ArrayList<>()).add(handler);
+        _handlers.put(handler, clazz);
+        return handler;
     }
     private static Disconnection disconnection = new Disconnection();
 
@@ -25,7 +31,7 @@ public class Packets {
         final ChannelInboundHandler finishProtocol = new ChannelInitializer<>() {
             @Override
             protected void initChannel(final Channel channel) {
-                Object o = channel.eventLoop().submit(() -> {
+                channel.eventLoop().submit(() -> {
                     channel.pipeline()
                             .addBefore("packet_handler", identifier, Client.getFromChannel(channel))
                             .addLast(disconnection);
@@ -52,14 +58,25 @@ public class Packets {
         cache.put(connection, connectionHandler);
     }
 
-    public static void onDisable(Plugin plugin) {
-        Client.fromChannel.values().forEach((v) -> v.channel.pipeline().remove(v));
+    public static void onEnable(Plugin plugin) {
+        identifier = plugin.getName().toLowerCase();
+    }
+    public static void onDisable(@SuppressWarnings("unused") Plugin unused) {
+        Client.fromChannel.values().forEach((v) -> {
+            v.channel.pipeline().remove(v);
+        });
         cache.forEach((k,v) -> k.channel().pipeline().remove(v));
     }
 
     @FunctionalInterface
     public interface Handler<T> {
-        T handle(Client player, T packet);
+        T handle(Client<?> player, T packet);
+        default void dispose() {
+            if(!_handlers.containsKey(this)) return;
+            if(!handlers.containsKey(_handlers.get(this))) return;
+            handlers.get(_handlers.get(this)).remove(this);
+            //TODO
+        }
     }
 
     @ChannelHandler.Sharable

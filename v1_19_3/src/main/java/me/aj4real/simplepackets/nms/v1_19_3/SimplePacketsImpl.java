@@ -2,7 +2,7 @@
  Copyright (c) All Rights Reserved
  *********************************/
 
-package me.aj4real.simplepackets.nms.v1_18_2;
+package me.aj4real.simplepackets.nms.v1_19_3;
 
 import io.netty.channel.ChannelFuture;
 import me.aj4real.simplepackets.*;
@@ -12,13 +12,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerConnectionListener;
 import net.minecraft.server.players.PlayerList;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
 import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.BiConsumer;
 
 public class SimplePacketsImpl implements SimplePackets {
     @Override
@@ -50,7 +49,9 @@ public class SimplePacketsImpl implements SimplePackets {
                 TheUnsafe.get().putObject(
                         con,
                         TheUnsafe.get().objectFieldOffset(connectionsField),
-                        new ProxyList<>(connections, (c) -> Client.getFromChannel(c.channel).setConnection(c), (c) -> {})
+                        new ProxyList<>(connections, (c) -> {
+                            if(!c.preparing) Client.getFromChannel(c.channel).setConnection(c);
+                        }, (c) -> {})
                 );
             }
 
@@ -63,10 +64,10 @@ public class SimplePacketsImpl implements SimplePackets {
                 TheUnsafe.get().putObject(
                         playerList,
                         TheUnsafe.get().objectFieldOffset(serverPlayersField),
-                        new ProxyList<>(players,
-                                (p) -> Client.getFromConnection(p.connection.connection).setPlayer(p.getBukkitEntity().getPlayer()),
-                                (p) -> {
-                                })
+                        new ProxyList<>(players, (p) -> {
+                            Client.getFromChannel(p.connection.connection.channel).setConnection(p.connection.connection);
+                            Client.getFromConnection(p.connection.connection).setPlayer(p.getBukkitEntity().getPlayer());
+                            }, (p) -> {})
                 );
 
             }

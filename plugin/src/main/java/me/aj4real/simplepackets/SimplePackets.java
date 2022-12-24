@@ -12,4 +12,6 @@ public interface SimplePackets {
     default void onDisable(Plugin plugin) {
         Packets.onDisable(plugin);
     }
+    void send(Object connection, Object packet);
+
 }

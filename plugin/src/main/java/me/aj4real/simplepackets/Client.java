@@ -8,13 +8,14 @@ import io.netty.channel.*;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 @ChannelHandler.Sharable
 public class Client<C> extends ChannelDuplexHandler {
-    public static BiConsumer sender = null;
+    public static SimplePackets nms = null;
     private Consumer<Player> playerWaiter = null;
     public static final Map<Integer, Client> fromChannel = new HashMap<>();
     public static final Map<Object, Client> fromConnection = new HashMap<>();
@@ -51,11 +52,12 @@ public class Client<C> extends ChannelDuplexHandler {
         return this.player;
     }
     public boolean sendPacket(Object packet) {
-        if(connection != null) {
-            sender.accept(connection, packet);
+        try {
+            Client.nms.send(this.connection, packet);
             return true;
+        } catch (AssertionError e) {
+            return false;
         }
-        else return false;
     }
     public void setPlayer(Player player) {
         this.player = player;
@@ -67,17 +69,22 @@ public class Client<C> extends ChannelDuplexHandler {
         else c.accept(this.player);
     }
     public void setConnection(C connection) {
+        assert (this.connection == null);
         this.connection = connection;
         fromConnection.put(connection, this);
     }
     private <T> T handle(T msg) {
         if(msg == null) return null;
-        Packets.Handler<T> handler = Packets.handlers.get(msg.getClass());
-        if(handler != null) {
-            try {
-                msg = handler.handle(this, msg);
-            } catch (Throwable e) {
-                e.printStackTrace();
+
+        List<Packets.Handler> handlers = Packets.handlers.get(msg.getClass());
+        if(handlers == null) return msg;
+        for (Packets.Handler<T> handler : handlers) {
+            if(handler != null) {
+                try {
+                    msg = handler.handle(this, msg);
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
             }
         }
         return msg;

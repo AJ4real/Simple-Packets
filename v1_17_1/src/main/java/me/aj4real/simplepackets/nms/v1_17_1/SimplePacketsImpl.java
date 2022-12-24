@@ -25,12 +25,14 @@ import java.util.List;
 import java.util.function.BiConsumer;
 
 public class SimplePacketsImpl implements SimplePackets {
-
+    @Override
+    public void send(Object connection, Object packet) {
+        assert (packet != null && connection != null);
+        assert (packet instanceof Packet && connection instanceof Connection);
+        ((Connection)connection).send((Packet)packet);
+    }
     public void onEnable(Plugin plugin) {
-
         try {
-            Client.sender = (BiConsumer<Connection, Packet>) (Connection::send);
-
             String findChannelsField = List.class.getCanonicalName() + "<" + ChannelFuture.class.getCanonicalName() + ">";
             Field channelsField = Arrays.stream(ServerConnectionListener.class.getDeclaredFields()).filter((f) -> f.getGenericType().getTypeName().equalsIgnoreCase(findChannelsField)).findFirst().get();
             channelsField.setAccessible(true);
@@ -43,7 +45,6 @@ public class SimplePacketsImpl implements SimplePackets {
                         new ProxyList<>(futures, Packets::inject, (ch) -> {})
                 );
             }
-
             String findConnectionsField = List.class.getCanonicalName() + "<" + Connection.class.getCanonicalName() + ">";
             Field connectionsField = Arrays.stream(ServerConnectionListener.class.getDeclaredFields()).filter((f) -> f.getGenericType().getTypeName().equalsIgnoreCase(findConnectionsField)).findAny().get();
             connectionsField.setAccessible(true);
