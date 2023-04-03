@@ -33,6 +33,12 @@
         </dependency>
         <dependency>
             <groupId>me.aj4real.simplepackets</groupId>
+            <artifactId>v1_19_4</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.aj4real.simplepackets</groupId>
             <artifactId>v1_19_3</artifactId>
             <version>${project.parent.version}</version>
             <scope>compile</scope>

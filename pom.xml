@@ -27,6 +27,7 @@
         <module>v1_18</module>
         <module>v1_17_1</module>
         <module>v1_17</module>
+        <module>v1_19_4</module>
     </modules>
 
     <build>

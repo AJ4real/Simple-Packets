@@ -46,7 +46,8 @@ public class Dist {
         v1_19(me.aj4real.simplepackets.nms.v1_19.SimplePacketsImpl.class),
         v1_19_1(me.aj4real.simplepackets.nms.v1_19_1.SimplePacketsImpl.class),
         v1_19_2(me.aj4real.simplepackets.nms.v1_19_2.SimplePacketsImpl.class),
-        v1_19_3(me.aj4real.simplepackets.nms.v1_19_3.SimplePacketsImpl.class);
+        v1_19_3(me.aj4real.simplepackets.nms.v1_19_3.SimplePacketsImpl.class),
+        v1_19_4(me.aj4real.simplepackets.nms.v1_19_4.SimplePacketsImpl.class);
         private final Class<? extends SimplePackets> nms;
         Version(Class<? extends SimplePackets> nms) {
             this.nms = nms;
